@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fighting Game Leaderboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Press Start 2P', cursive;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: black;
+      color: white;
+      text-align: center;
+    }
+
+    h1 {
+      color: rgb(124, 170, 255);
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #111;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+
+    th {
+      background: #222;
+      color: #ffcc00;
+      padding: 12px;
+      border: 2px solid #444;
+    }
+
+    td {
+      padding: 10px;
+      border: 1px solid #333;
+      color: #ddd;
+    }
+
+    tr:nth-child(even) {
+      background-color: #1a1a1a;
+    }
+
+    .matchup {
+      color: #ff4444;
+    }
+
+    .winner {
+      color: #00ff99;
+    }
+
+    .time {
+      font-size: 10px;
+      color: #aaa;
+    }
+
+    .back-button {
+      margin-top: 30px;
+      background: #444;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 12px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .back-button:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>Leaderboard</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Match</th>
+        <th>Winner</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody id="leaderboardBody"></tbody>
+  </table>
+
+  <button class="back-button" onclick="goBack()">⬅ Back to Menu</button>
+
+  <script>
+    async function loadLeaderboard() {
+      try {
+        const res = await fetch('http://localhost:5000/api/leaderboard');
+        const data = await res.json();
+        const tbody = document.getElementById('leaderboardBody');
+        tbody.innerHTML = '';
+
+        data.reverse().forEach(match => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="matchup">${match.player1} vs ${match.player2}</td>
+            <td class="winner">${match.winner}</td>
+            <td class="time">${match.time}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        console.error('Failed to load leaderboard:', err);
+      }
+    }
+
+    function goBack() {
+      window.location.href = 'menu.html';
+    }
+
+    loadLeaderboard();
+  </script>
+</body>
+</html>

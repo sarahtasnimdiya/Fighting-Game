@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fighting Game Menu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; font-family: 'Press Start 2P', cursive; }
+    body { margin: 0; background: #000; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
+    input, button {
+      font-size: 14px;
+      margin: 10px;
+      padding: 10px;
+      border-radius: 4px;
+      border: none;
+      text-align: center;
+    }
+    button {
+      background: #444;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover { background: #666; }
+  </style>
+</head>
+<body>
+  <h1 style="color: rgb(124, 170, 255);">Fighting Game</h1>
+  <h4>Enter Player Names!</h4>
+  <input type="text" id="player1Name" placeholder="Player 1" />
+  <input type="text" id="player2Name" placeholder="Player 2" />
+  <button onclick="startGame()">Start Match</button>
+
+  <!-- New Leaderboard Button -->
+  <button onclick="viewLeaderboard()">View Leaderboard</button>
+
+  <script src="menu.js"></script>
+</body>
+</html>

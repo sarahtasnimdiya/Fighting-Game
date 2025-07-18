@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Fighting Game</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: 'Press Start 2P', cursive;
+      }
+
+      body, html {
+          height: 100%;
+          margin: 0;
+        }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        overflow: hidden;
+        background: #614f70;
+        color: rgb(0, 0, 0);
+      }
+
+      canvas {
+        display: block;
+      }
+
+      #mainMenu {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(to bottom, #111, #222);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+      }
+
+      #mainMenu input {
+        font-size: 14px;
+        margin: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        border: none;
+        text-align: center;
+      }
+
+      #mainMenu button {
+        margin-top: 20px;
+        padding: 12px 24px;
+        font-size: 14px;
+        border-radius: 6px;
+        background: #444;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      #mainMenu button:hover {
+        background: #666;
+      }
+
+      #gameContainer {
+        display: none;
+        position: relative;
+        display: inline-block;
+      }
+
+      #displayText {
+        position: absolute;
+        color: white;
+        align-items: center;
+        justify-content: center;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: none;
+        font-size: 20px;
+      }
+
+      #gameOverScreen {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(74, 65, 99, 0.85);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-family: 'Press Start 2P', cursive;
+        z-index: 999;
+        opacity: 0;
+        transition: opacity 0.6s ease-in-out;
+}
+
+      #gameOverScreen.show {
+  opacity: 1;
+}
+
+#winnerText {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: rgb(124, 170, 255);
+  text-shadow: 0 0 10px rgb(30, 49, 85), 0 0 20px #000000;
+  animation: glow 2s infinite alternate;
+  text-align: center;
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 10px #917de5; }
+  to { text-shadow: 0 0 30px #94bbd3; }
+}
+
+.tie {
+  color: yellow;
+  text-shadow: 0 0 15px #ff693b, 0 0 25px #ffd700;
+  animation: tieGlow 2s infinite alternate;
+}
+
+@keyframes tieGlow {
+  from { text-shadow: 0 0 10px #ffab61; }
+  to { text-shadow: 0 0 30px #fff59d; }
+}
+.game-over-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.game-over-buttons button {
+  font-size: 14px;
+  padding: 12px 18px;
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.game-over-buttons button:hover {
+  background: #666;
+}
+
+.winner-name {
+  color: #e53935; /* bold, warm red */
+  text-shadow: 
+    0 0 6px #1a1a40,    /* deep bluish base */
+    0 0 12px #6b3636,   /* soft cool blue highlight */
+    0 0 20px #7cabed;   /* outer light blue glow */
+}
+
+
+.hidden {
+  display: none;
+}
+.spacer {
+  height: 20px; /* or adjust to your preferred spacing */
+}
+
+
+    </style>
+  </head>
+
+  <body>
+
+
+    <!-- 🕹️ Game Interface -->
+    <div id="gameContainer">
+      <!-- Health Bars and Timer -->
+      <div
+        style="
+          position: absolute;
+          display: flex;
+          width: 100%;
+          align-items: center;
+          padding: 20px;
+        "
+      >
+        <!-- Player 1 Health -->
+        <div
+          style="
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            border-top: 4px solid white;
+            border-left: 4px solid white;
+            border-bottom: 4px solid white;
+          "
+        >
+          <div style="background-color: red; height: 30px; width: 100%"></div>
+          <div
+            id="playerHealth"
+            style="
+              position: absolute;
+              background: #818cf8;
+              top: 0;
+              right: 0;
+              bottom: 0;
+              width: 100%;
+            "
+          ></div>
+        </div>
+
+        <!-- Timer -->
+        <div
+          id="timer"
+          style="
+            background-color: black;
+            width: 100px;
+            height: 50px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: 4px solid white;
+          "
+        >
+          10
+        </div>
+
+        <!-- Player 2 Health -->
+        <div
+          style="
+            position: relative;
+            width: 100%;
+            border-top: 4px solid white;
+            border-bottom: 4px solid white;
+            border-right: 4px solid white;
+          "
+        >
+          <div style="background-color: red; height: 30px"></div>
+          <div
+            id="enemyHealth"
+            style="
+              position: absolute;
+              background: #818cf8;
+              top: 0;
+              right: 0;
+              bottom: 0;
+              left: 0;
+            "
+          ></div>
+        </div>
+      </div>
+
+      <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="game-over-screen hidden" >
+         <div class="game-over-content">
+          <h1 id="winnerText">Player Wins!</h1>
+          <div class="spacer"></div>
+          <div class="game-over-buttons">
+             <button onclick="restartGame()">Play Again</button>
+             <button onclick="goToMenu()">Main Menu</button>
+           </div>
+          </div>
+        </div>
+
+
+
+      <!-- Game Canvas -->
+      <canvas></canvas>
+    </div>
+
+    <!-- Scripts -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"
+      integrity="sha512-H6cPm97FAsgIKmlBA4s774vqoN24V5gSQL4yBTDOY2su2DeXZVhQPxFK4P6GPdnZqM9fg1G3cMv5wD7e6cFLZQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="js/utils.js"></script>
+    <script src="js/classes.js"></script>
+    <script src="index.js"></script>
+
+    </body>
