@@ -11,21 +11,35 @@
       box-sizing: border-box;
       font-family: 'Press Start 2P', cursive;
     }
+
     body {
       margin: 0;
       padding: 20px;
-      background-color: black;
+      background: #614f70 url('img/menu.png') center center no-repeat;
+      background-size: 80%;
       color: white;
       text-align: center;
+      min-height: 100vh;
     }
 
     h1 {
-      color: rgb(124, 170, 255);
-      margin-bottom: 30px;
+      font-size: 34px;
+      margin-bottom: 40px;
+      color: #8ecaff;
+      text-shadow:
+        -4px -2px 0 #180d6b,
+        -4px  2px 0 #371080,
+        4px  2px 0 #120a59,
+        4px -2px 0 #150a59,
+        0px  2px 0 #270a59,
+        0px -2px 0 #270a59,
+        8px 4px 0 #1c0748;
     }
 
     table {
-      width: 100%;
+      width: 90%;
+      max-width: 900px;
+      margin: 0 auto 40px;
       border-collapse: collapse;
       background: #111;
       box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
@@ -33,14 +47,16 @@
 
     th {
       background: #222;
-      color: #ffcc00;
-      padding: 12px;
+      color: #ffffff;
+      padding: 14px;
       border: 2px solid #444;
+      font-size: 14px;
     }
 
     td {
-      padding: 10px;
+      padding: 12px 8px;
       border: 1px solid #333;
+      font-size: 10px;
       color: #ddd;
     }
 
@@ -57,28 +73,30 @@
     }
 
     .time {
-      font-size: 10px;
       color: #aaa;
     }
 
     .back-button {
-      margin-top: 30px;
-      background: #444;
+      background: #333;
       color: white;
       border: none;
-      padding: 12px 20px;
+      padding: 14px 30px;
       font-size: 12px;
+      border-radius: 4px;
       cursor: pointer;
-      border-radius: 5px;
+      box-shadow: 3px 3px 0 #111;
+      transition: background 0.2s, transform 0.1s;
     }
 
     .back-button:hover {
-      background-color: #666;
+      background-color: #555;
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
-  <h1>Leaderboard</h1>
+  <h1>LEADERBOARD</h1>
+
   <table>
     <thead>
       <tr>
@@ -90,7 +108,7 @@
     <tbody id="leaderboardBody"></tbody>
   </table>
 
-  <button class="back-button" onclick="goBack()">⬅ Back to Menu</button>
+  <button class="back-button" onclick="goBack()">⬅ BACK TO MENU</button>
 
   <script>
     async function loadLeaderboard() {
