@@ -234,11 +234,12 @@
         20px 6px 0 #072248;
     }
 
-
     </style>
   </head>
 
   <body>
+
+    <script type="module" src="js/firebase.js"></script>
 
   <!-- Loading Screen -->
   <div id="loadingScreen">
@@ -358,5 +359,38 @@
     <script src="js/utils.js"></script>
     <script src="js/classes.js"></script>
     <script src="js/game.js"></script>
+    <script>
+      const imagesToLoad = [
+      './img/loading.png',
+      './img/background.png',
+      './img/shop.png',
+      './img/samuraiMack/Idle.png',
+      './img/kenji/Idle.png'
+    ];
+
+    let loadedCount = 0;
+
+    function updateLoadingBar() {
+      const percent = Math.floor((loadedCount / imagesToLoad.length) * 100);
+      document.getElementById('loadingBar').style.width = percent + '%';
+    }
+
+    imagesToLoad.forEach(src => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        loadedCount++;
+        updateLoadingBar();
+        if (loadedCount === imagesToLoad.length) {
+          setTimeout(() => {
+            document.getElementById('loadingScreen').style.opacity = 0;
+            setTimeout(() => {
+              document.getElementById('loadingScreen').style.display = 'none';
+            }, 800);
+          }, 500);
+        }
+      };
+    });
+    </script>
 
     </body>
