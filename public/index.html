@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fighting Game Menu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    body {
+      margin: 0;
+      background: #614f70 url('img/menu.png') center center no-repeat;
+      background-size: 80%;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .fighting-title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: clamp(24px, 6vw, 80px);
+      font-weight: bold;
+      color: #ffffff;
+      line-height: 1.2;
+      white-space: pre-line;
+      text-align: center;
+      letter-spacing: .00001px;
+      margin: 38px auto;
+      text-shadow:
+        -10px -4px 0 #0d366b,
+        -10px 2px 0 #104180,
+        -10px 4px 0 #133766,
+        0px 4px 0 #0a2c59,
+        10px 4px 0 #0a2c59,
+        10px 0px 0 #0a2c59,
+        10px -4px 0 #0a2c59,
+        0px -4px 0 #0a2c59,
+        20px 6px 0 #072248;
+    }
+
+    .menu-button {
+      font-size: clamp(12px, 1.4vw, 14px);
+      padding: 14px 32px;
+      margin: 15px;
+      margin-top: -3px;
+      border: none;
+      border-radius: 4px;
+      background: #333;
+      color: white;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #111;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .menu-button:hover {
+      background: #555;
+      transform: scale(1.2);
+    }
+
+    #loadingScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: url('img/menu.png') center center no-repeat;
+      background-size: 80%;
+      background-color: #614f70;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #loadingBarContainer {
+      width: 80%;
+      margin-bottom: 65px; 
+      background: #0d366b; 
+      border: 2px solid #104180; 
+      padding: 4px;
+      box-shadow: 0 0 8px #0d366b; 
+      border-radius: 12px; 
+    }
+
+    #loadingBar {
+      width: 0%;
+      height: 20px;
+      background: #5f90d4; 
+      box-shadow: 0 0 8px #104180; 
+      transition: width 0.6s;
+      border-radius: 8px; 
+    }
+
+
+
+    #loadingTitle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Press Start 2P', cursive;
+      font-size: clamp(24px, 6vw, 80px);
+      font-weight: bold;
+      color: #ffffff;
+      line-height: 1.2;
+      white-space: pre-line;
+      text-align: center;
+      letter-spacing: .00001px;
+      text-shadow:
+        -10px -4px 0 #0d366b,
+        -10px  2px 0 #104180,
+        -10px  4px 0 #133766,
+        0px  4px 0 #0a2c59,
+        10px  4px 0 #0a2c59,
+        10px  0px 0 #0a2c59,
+        10px -4px 0 #0a2c59,
+        0px -4px 0 #0a2c59,
+        20px 6px 0 #072248;
+    }
+  </style>
+</head>
+<body>
+  <script type="module" src="js/firebase.js"></script>
+
+
+  <!-- Loading Screen -->
+  <div id="loadingScreen">
+    <div id="loadingTitle">FIGHTING<br>GAME</div>
+    <div id="loadingBarContainer">
+      <div id="loadingBar"></div>
+    </div>
+  </div>
+
+  <!-- Main Menu -->
+  <h1 class="fighting-title">FIGHTING<br>GAME</h1>
+
+  <span style="margin-top: -20px;">
+    <button class="menu-button" onclick="location.href='player-names.html'">▶ Play</button>
+  </span>
+  <button class="menu-button" onclick="viewLeaderboard()">View Leaderboard</button>
+
+  <script>
+    function viewLeaderboard() {
+      window.location.href = 'leaderboard.html';
+    }
+
+    const imagesToLoad = [
+      './img/loading.png',
+      './img/background.png',
+      './img/shop.png',
+      './img/samuraiMack/Idle.png',
+      './img/kenji/Idle.png'
+    ];
+
+    let loadedCount = 0;
+
+    function updateLoadingBar() {
+      const percent = Math.floor((loadedCount / imagesToLoad.length) * 100);
+      document.getElementById('loadingBar').style.width = percent + '%';
+    }
+
+    imagesToLoad.forEach(src => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        loadedCount++;
+        updateLoadingBar();
+        if (loadedCount === imagesToLoad.length) {
+          setTimeout(() => {
+            document.getElementById('loadingScreen').style.opacity = 0;
+            setTimeout(() => {
+              document.getElementById('loadingScreen').style.display = 'none';
+            }, 800);
+          }, 500);
+        }
+      };
+    });
+  </script>
+</body>
+</html>

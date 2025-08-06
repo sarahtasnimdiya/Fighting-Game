@@ -1,30 +1,39 @@
-const express = require('express')
-const router = express.Router()
-const Match = require('../models/Match')
+// routes/leaderboard.js
 
-// POST a new match
-router.post('/', async (req, res) => {
-  try {
-    const match = new Match(req.body)
-    const savedMatch = await match.save()
-    res.status(201).json(savedMatch)
-  } catch (err) {
-    console.error('Error saving match:', err)
-    res.status(500).json({ message: 'Server error saving match' })
-  }
-})
+const express = require('express');
 
-// GET all matches
-router.get('/', async (req, res) => {
-  try {
-    const matches = await Match.find().sort({ time: -1 })
-    res.json(matches)
-  } catch (error) {
-    console.error('Error fetching matches:', error)
-    res.status(500).json({ message: 'Server error fetching matches' })
-  }
-})
+module.exports = (db) => {
+  const router = express.Router();
+  const matchesRef = db.collection('matches');
 
+  // GET /api/leaderboard — Get all match results (ordered by time DESC)
+  router.get('/', async (req, res) => {
+    try {
+      const snapshot = await matchesRef.orderBy('time', 'desc').get();
+      const leaderboard = snapshot.docs.map(doc => doc.data());
+      res.json(leaderboard);
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+      res.status(500).json({ error: 'Failed to fetch leaderboard' });
+    }
+  });
 
+  // POST /api/leaderboard — Add new match result
+  router.post('/', async (req, res) => {
+    const matchData = req.body;
 
-module.exports = router
+    if (!matchData || !matchData.winner || !matchData.time) {
+      return res.status(400).json({ error: 'Invalid match data' });
+    }
+
+    try {
+      const newDoc = await matchesRef.add(matchData);
+      res.status(201).json({ message: 'Match saved', id: newDoc.id });
+    } catch (error) {
+      console.error('Error saving match:', error);
+      res.status(500).json({ error: 'Failed to save match' });
+    }
+  });
+
+  return router;
+};

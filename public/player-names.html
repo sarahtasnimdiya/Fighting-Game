@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Enter Player Names</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    html {
+      font-size: clamp(10px, 1.2vw, 16px);
+    }
+
+    body {
+      margin: 0;
+      background: #614f70 url('img/menu.png') center center no-repeat;
+      background-size: 80%;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    h3 {
+      font-size: clamp(20px, 4vw, 36px);
+      text-align: center;
+      margin-top: -30px;
+      margin-bottom: 40px;
+      text-shadow:
+        -4px -2px 0 #0d366b,
+        -4px  2px 0 #104180,
+        4px  2px 0 #0a2c59,
+        4px -2px 0 #0a2c59,
+        0px  2px 0 #0a2c59,
+        0px -2px 0 #0a2c59,
+        8px 4px 0 #072248;
+    }
+
+    input {
+      font-size: clamp(10px, 1.2vw, 14px);
+      padding: 10px;
+      width: clamp(200px, 30vw, 300px);
+      margin: 8px;
+      border: 2px solid #aaa;
+      border-radius: 4px;
+      background: #222;
+      color: white;
+      text-align: center;
+      box-shadow: 3px 3px 0 #111;
+    }
+
+    button {
+      font-size: clamp(12px, 1.4vw, 18px);
+      padding: 14px 32px;
+      margin-top: 24px;
+      border: none;
+      border-radius: 4px;
+      background: #333;
+      color: white;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #111;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    button:hover {
+      background: #555;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+
+  <h3>ENTER PLAYER NAMES!!</h3>
+
+  <input type="text" id="player1Name" placeholder="PLAYER 1" />
+  <input type="text" id="player2Name" placeholder="PLAYER 2" />
+  <button onclick="startGame()">▶ START MATCH</button>
+
+  <script>
+    function startGame() {
+      const player1 = document.getElementById('player1Name').value.trim();
+      const player2 = document.getElementById('player2Name').value.trim();
+
+      localStorage.setItem('player1Name', player1 || 'Player 1');
+      localStorage.setItem('player2Name', player2 || 'Player 2');
+
+      window.location.href = 'game.html';
+    }
+  </script>
+</body>
+</html>
