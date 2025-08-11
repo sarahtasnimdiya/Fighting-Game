@@ -1,54 +1,37 @@
-// functions/leaderboard.js
-const express = require("express");
-const admin = require("firebase-admin");
+// public/js/leaderboard.js  (Frontend version)
 
-module.exports = () => {
-  const router = express.Router();
-  const matchesRef = admin.firestore().collection("matches");
+// Replace with your deployed Vercel backend URL
+const API_BASE = "https://fighting-game-e02r632mc-sarah-tasnim-diyas-projects.vercel.app/api/leaderboard";
 
-  /**
-   * GET /api/leaderboard
-   * Returns all matches ordered by time (newest first)
-   */
-  router.get("/", async (req, res) => {
-    try {
-      const snapshot = await matchesRef.orderBy("time", "desc").get();
-      const leaderboard = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      res.json(leaderboard);
-    } catch (error) {
-      console.error("Error fetching leaderboard:", error);
-      res.status(500).json({ error: "Failed to fetch leaderboard" });
-    }
-  });
+// Fetch leaderboard data from Vercel API
+export async function fetchLeaderboard() {
+  try {
+    const response = await fetch(API_BASE);
+    if (!response.ok) throw new Error("Failed to fetch leaderboard");
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching leaderboard:", error);
+    return [];
+  }
+}
 
-  /**
-   * POST /api/leaderboard
-   * Adds a new match result to Firestore
-   */
-  router.post("/", async (req, res) => {
-    const { winner, loser } = req.body;
+// Save match result to Vercel API
+export async function saveMatch(winner, loser) {
+  try {
+    const response = await fetch(API_BASE, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ winner, loser })
+    });
 
-    // Basic validation
-    if (!winner || !loser) {
-      return res.status(400).json({ error: "Winner and loser are required" });
-    }
+    if (!response.ok) throw new Error("Failed to save match");
 
-    try {
-      const matchData = {
-        winner,
-        loser,
-        time: admin.firestore.Timestamp.now() // use server time
-      };
-      const newDoc = await matchesRef.add(matchData);
-      res.status(201).json({ message: "Match saved", id: newDoc.id });
-    } catch (error) {
-      console.error("Error saving match:", error);
-      res.status(500).json({ error: "Failed to save match" });
-    }
-  });
-
-  return router;
-};
+    const result = await response.json();
+    console.log("Match saved:", result);
+  } catch (error) {
+    console.error("Error saving match:", error);
+  }
+}
