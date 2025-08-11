@@ -1,37 +1,52 @@
-// routes/leaderboard.js
+// functions/leaderboard.js
+const express = require("express");
+const admin = require("firebase-admin");
 
-const express = require('express');
-
-module.exports = (db) => {
+module.exports = () => {
   const router = express.Router();
-  const matchesRef = db.collection('matches');
+  const matchesRef = admin.firestore().collection("matches");
 
-  // GET /api/leaderboard — Get all match results (ordered by time DESC)
-  router.get('/', async (req, res) => {
+  /**
+   * GET /api/leaderboard
+   * Returns all matches ordered by time (newest first)
+   */
+  router.get("/", async (req, res) => {
     try {
-      const snapshot = await matchesRef.orderBy('time', 'desc').get();
-      const leaderboard = snapshot.docs.map(doc => doc.data());
+      const snapshot = await matchesRef.orderBy("time", "desc").get();
+      const leaderboard = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
       res.json(leaderboard);
     } catch (error) {
-      console.error('Error fetching leaderboard:', error);
-      res.status(500).json({ error: 'Failed to fetch leaderboard' });
+      console.error("Error fetching leaderboard:", error);
+      res.status(500).json({ error: "Failed to fetch leaderboard" });
     }
   });
 
-  // POST /api/leaderboard — Add new match result
-  router.post('/', async (req, res) => {
-    const matchData = req.body;
+  /**
+   * POST /api/leaderboard
+   * Adds a new match result to Firestore
+   */
+  router.post("/", async (req, res) => {
+    const { winner, loser } = req.body;
 
-    if (!matchData || !matchData.winner || !matchData.time) {
-      return res.status(400).json({ error: 'Invalid match data' });
+    // Basic validation
+    if (!winner || !loser) {
+      return res.status(400).json({ error: "Winner and loser are required" });
     }
 
     try {
+      const matchData = {
+        winner,
+        loser,
+        time: admin.firestore.Timestamp.now() // use server time
+      };
       const newDoc = await matchesRef.add(matchData);
-      res.status(201).json({ message: 'Match saved', id: newDoc.id });
+      res.status(201).json({ message: "Match saved", id: newDoc.id });
     } catch (error) {
-      console.error('Error saving match:', error);
-      res.status(500).json({ error: 'Failed to save match' });
+      console.error("Error saving match:", error);
+      res.status(500).json({ error: "Failed to save match" });
     }
   });
 
