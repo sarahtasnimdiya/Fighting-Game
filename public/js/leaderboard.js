@@ -1,7 +1,7 @@
 // public/js/leaderboard.js  (Frontend version)
 
 // Replace with your deployed Vercel backend URL
-const API_BASE = "https://fighting-game-e02r632mc-sarah-tasnim-diyas-projects.vercel.app/api/leaderboard";
+const API_BASE = "https://fighting-game-backend.vercel.app/api/leaderboard";
 
 // Fetch leaderboard data from Vercel API
 export async function fetchLeaderboard() {
