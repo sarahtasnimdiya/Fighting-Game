@@ -7,6 +7,8 @@ canvas.height = 576
 c.fillRect(0, 0, canvas.width, canvas.height)
 
 const gravity = 0.7
+let gameOver = false;
+
 
 const background = new Sprite({
   position: {
@@ -262,18 +264,22 @@ function animate() {
     enemy.isAttacking = false
   }
 
-  // end game
-  if (enemy.health <= 0 || player.health <= 0) {
-    const name1 = localStorage.getItem('player1Name') || 'Player 1'
-    const name2 = localStorage.getItem('player2Name') || 'Player 2'
+  // end game - only trigger once
+  if (!gameOver && (enemy.health <= 0 || player.health <= 0)) {
+    gameOver = true; // ✅ prevent duplicates
+
+    const name1 = localStorage.getItem('player1Name') || 'Player 1';
+    const name2 = localStorage.getItem('player2Name') || 'Player 2';
+
     if (enemy.health <= 0 && player.health > 0) {
-      showGameOver(name1)
+      showGameOver(name1);
     } else if (player.health <= 0 && enemy.health > 0) {
-      showGameOver(name2)
+      showGameOver(name2);
     } else {
-      showGameOver('No One')
+      showGameOver('No One');
     }
   }
+
 
   
 }
@@ -343,32 +349,49 @@ window.addEventListener('keyup', (event) => {
 
 // save match to leaderboard
 async function saveToLeaderboard(player1, player2, winner) {
-  const match = {
-    player1,
-    player2,
-    winner,
-    time: new Date().toLocaleString()
+  let match = {}
+
+  if (winner === "No One") {
+    // --- Tie case ---
+    match = {
+      player1,
+      player2,
+      winner: "Tie",
+      loser: "Tie",
+      time: new Date().toLocaleString()
+    }
+  } else {
+    // --- Normal case ---
+    const loser = winner === player1 ? player2 : player1
+    match = {
+      player1,
+      player2,
+      winner,
+      loser,
+      time: new Date().toLocaleString()
+    }
   }
 
-  console.log('Saving match:', match)
+  console.log("Saving match:", match)
 
   try {
-    const res = await fetch('https://fighting-game-backend.vercel.app/api/leaderboard', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch("https://fighting-game-backend.vercel.app/api/leaderboard", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(match)
     })
 
     if (!res.ok) {
       const err = await res.text()
-      console.error('Failed to save match. Server responded with:', res.status, err)
+      console.error("❌ Failed to save match. Server responded with:", res.status, err)
     } else {
-      console.log('Match saved to leaderboard')
+      console.log("✅ Match saved to leaderboard")
     }
   } catch (error) {
-    console.error('Failed to save match (network error):', error)
+    console.error("❌ Failed to save match (network error):", error)
   }
 }
+
 
 // game over interface logic
 function showGameOver(winnerName) {
@@ -395,9 +418,11 @@ function showGameOver(winnerName) {
 }
 
 function restartGame() {
+  gameOver = false;
   window.location.reload()
 }
 
 function goToMenu() {
+  gameOver = false;
   window.location.href = '../index.html'
 }
