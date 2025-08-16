@@ -353,7 +353,7 @@ async function saveToLeaderboard(player1, player2, winner) {
   console.log('Saving match:', match)
 
   try {
-    const res = await fetch('https://fighting-game-4d09a.web.app/api/leaderboard', {
+    const res = await fetch('https://fighting-game-backend.vercel.app/api/leaderboard', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(match)

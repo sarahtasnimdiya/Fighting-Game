@@ -116,7 +116,7 @@
   <script>
     async function loadLeaderboard() {
       try {
-        const res = await fetch('http://localhost:5000/api/leaderboard');
+        const res = await fetch('https://fighting-game-backend.vercel.app/api/leaderboard');
         const data = await res.json();
         const tbody = document.getElementById('leaderboardBody');
         tbody.innerHTML = '';
