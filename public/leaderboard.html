@@ -114,12 +114,41 @@
   <button class="back-button" onclick="goBack()">⬅ BACK TO MENU</button>
 
   <script>
+    // ✅ Use the same sessionId logic as in game.js
+    let sessionId = sessionStorage.getItem("sessionId");
+    if (!sessionId) {
+      sessionId = crypto.randomUUID();
+      sessionStorage.setItem("sessionId", sessionId);
+    }
+
     async function loadLeaderboard() {
+      
       try {
-        const res = await fetch('https://fighting-game-backend.vercel.app/api/leaderboard');
+        // ✅ Send sessionId as query parameter so backend filters matches
+        const res = await fetch(
+          `https://fighting-game-backend.vercel.app/api/leaderboard?sessionId=${sessionId}`
+        );
+      if (!res.ok) {
+          throw new Error("Server returned " + res.status);
+        }
+
         const data = await res.json();
         const tbody = document.getElementById('leaderboardBody');
         tbody.innerHTML = '';
+
+        if (!Array.isArray(data) || data.length === 0) {
+          const row = document.createElement('tr');
+          row.innerHTML = `<td colspan="3" style="color:#888;">No matches played yet in this session.</td>`;
+          tbody.appendChild(row);
+          return;
+        }
+
+        if (data.length === 0) {
+          const row = document.createElement('tr');
+          row.innerHTML = `<td colspan="3" style="color:#888;">No matches played yet this session.</td>`;
+          tbody.appendChild(row);
+          return;
+        }
 
         data.forEach(match => {
           const row = document.createElement('tr');
@@ -134,7 +163,6 @@
         console.error('Failed to load leaderboard:', err);
       }
     }
-
 
     function goBack() {
       window.location.href = 'index.html';

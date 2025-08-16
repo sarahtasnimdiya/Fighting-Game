@@ -8,7 +8,14 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 
 const gravity = 0.7
 let gameOver = false;
+let matchSaved = false;
 
+// generate sessionId once per browser session
+let sessionId = sessionStorage.getItem("sessionId");
+if (!sessionId) {
+  sessionId = crypto.randomUUID();
+  sessionStorage.setItem("sessionId", sessionId);
+}
 
 const background = new Sprite({
   position: {
@@ -347,9 +354,15 @@ window.addEventListener('keyup', (event) => {
   }
 })
 
-// save match to leaderboard
-async function saveToLeaderboard(player1, player2, winner) {
-  let match = {}
+
+
+
+  // save match to leaderboard
+  async function saveToLeaderboard(player1, player2, winner) {
+  if (matchSaved) return;   // ✅ prevent duplicate saves
+  matchSaved = true;
+
+  let match = {};
 
   if (winner === "No One") {
     // --- Tie case ---
@@ -358,40 +371,39 @@ async function saveToLeaderboard(player1, player2, winner) {
       player2,
       winner: "Tie",
       loser: "Tie",
-      time: new Date().toLocaleString()
-    }
+      sessionId
+    };
   } else {
     // --- Normal case ---
-    const loser = winner === player1 ? player2 : player1
+    const loser = winner === player1 ? player2 : player1;
     match = {
       player1,
       player2,
       winner,
       loser,
-      time: new Date().toLocaleString()
-    }
+      sessionId, // ✅ include sessionId
+    };
   }
 
-  console.log("Saving match:", match)
+  console.log("Saving match:", match);
 
   try {
     const res = await fetch("https://fighting-game-backend.vercel.app/api/leaderboard", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(match)
-    })
+    });
 
     if (!res.ok) {
-      const err = await res.text()
-      console.error("❌ Failed to save match. Server responded with:", res.status, err)
+      const err = await res.text();
+      console.error("❌ Failed to save match. Server responded with:", res.status, err);
     } else {
-      console.log("✅ Match saved to leaderboard")
+      console.log("✅ Match saved to leaderboard");
     }
   } catch (error) {
-    console.error("❌ Failed to save match (network error):", error)
+    console.error("❌ Failed to save match (network error):", error);
   }
 }
-
 
 // game over interface logic
 function showGameOver(winnerName) {
@@ -419,10 +431,12 @@ function showGameOver(winnerName) {
 
 function restartGame() {
   gameOver = false;
+  matchSaved = false; 
   window.location.reload()
 }
 
 function goToMenu() {
   gameOver = false;
+  matchSaved = false; 
   window.location.href = '../index.html'
 }
