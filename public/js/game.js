@@ -171,7 +171,6 @@ const keys = {
   }
 }
 
-decreaseTimer()
 
 function animate() {
   window.requestAnimationFrame(animate)
@@ -286,12 +285,15 @@ function animate() {
       showGameOver('No One');
     }
   }
-
-
   
 }
 
-animate()
+function startGame() {
+  decreaseTimer();
+  document.getElementById("gameContainer").style.display = "inline-block";
+}
+
+animate();
 
 // input events
 window.addEventListener('keydown', (event) => {
@@ -360,7 +362,6 @@ window.addEventListener('keyup', (event) => {
   // save match to leaderboard
   async function saveToLeaderboard(player1, player2, winner) {
   if (matchSaved) return;   // ✅ prevent duplicate saves
-  matchSaved = true;
 
   let match = {};
   const currentMatchTime = timer; 
@@ -402,6 +403,7 @@ window.addEventListener('keyup', (event) => {
       console.error("❌ Failed to save match. Server responded with:", res.status, err);
     } else {
       console.log("✅ Match saved to leaderboard");
+      matchSaved = true; 
     }
   } catch (error) {
     console.error("❌ Failed to save match (network error):", error);
@@ -411,7 +413,6 @@ window.addEventListener('keyup', (event) => {
 // game over interface logic
 function showGameOver(winnerName) {
   if (matchSaved) return;   // ✅ make extra sure
-  matchSaved = true;
   
   const screen = document.getElementById('gameOverScreen')
   const winnerText = document.getElementById('winnerText')
@@ -436,13 +437,13 @@ function showGameOver(winnerName) {
 }
 
 function restartGame() {
-  gameOver = false;
-  matchSaved = false; 
   window.location.reload()
 }
 
 function goToMenu() {
-  gameOver = false;
-  matchSaved = false; 
   window.location.href = '../index.html'
+}
+
+function viewLeaderboard() {
+  window.location.href = '../leaderboard.html'
 }

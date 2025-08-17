@@ -10,22 +10,6 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
   )
 }
 
-function determineWinner({ player, enemy, timerId }) {
-  clearTimeout(timerId)
-  document.querySelector('#displayText').style.display = 'flex'
-  if (player.health === enemy.health) {
-    document.querySelector('#displayText').innerHTML = 'Tie';
-    showGameOver('No One');
-  } else if (player.health > enemy.health) {
-    document.querySelector('#displayText').innerHTML = 'Player 1 Wins';
-    const name1 = localStorage.getItem('player1Name') || 'Player 1';
-    showGameOver(name1);
-  } else {
-    document.querySelector('#displayText').innerHTML = 'Player 2 Wins';
-    const name2 = localStorage.getItem('player2Name') || 'Player 2';
-    showGameOver(name2);
-  }
-}
 
 let timer = 60
 let timerId
@@ -39,8 +23,9 @@ function decreaseTimer() {
     const name1 = localStorage.getItem('player1Name') || 'Player 1'
     const name2 = localStorage.getItem('player2Name') || 'Player 2'
 
+    // Decide winner by health
     if (player.health === enemy.health) {
-      showGameOver("No One")  // ✅ show UI & save inside showGameOver()
+      showGameOver('No One') // It's a draw
     } else if (player.health > enemy.health) {
       showGameOver(name1)
     } else {
@@ -48,4 +33,3 @@ function decreaseTimer() {
     }
   }
 }
-

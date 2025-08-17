@@ -303,7 +303,7 @@
             border: 4px solid white;
           "
         >
-          10
+          60
         </div>
 
         <!-- Player 2 Health -->
@@ -339,6 +339,7 @@
           <div class="game-over-buttons">
              <button onclick="restartGame()">Play Again</button>
              <button onclick="goToMenu()">Main Menu</button>
+             <button onclick="viewLeaderboard()">View Leaderboard</button>
            </div>
           </div>
         </div>
@@ -382,13 +383,17 @@
         loadedCount++;
         updateLoadingBar();
         if (loadedCount === imagesToLoad.length) {
+        setTimeout(() => {
+          const loadingScreen = document.getElementById('loadingScreen');
+          loadingScreen.style.opacity = 0;
+
           setTimeout(() => {
-            document.getElementById('loadingScreen').style.opacity = 0;
-            setTimeout(() => {
-              document.getElementById('loadingScreen').style.display = 'none';
-            }, 800);
-          }, 500);
-        }
+            loadingScreen.style.display = 'none';
+            // ✅ Start the game once loading screen disappears
+            startGame();
+          }, 800);
+        }, 500);
+      }
       };
     });
     </script>
