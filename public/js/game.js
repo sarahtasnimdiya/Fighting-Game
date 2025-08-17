@@ -363,7 +363,7 @@ window.addEventListener('keyup', (event) => {
   matchSaved = true;
 
   let match = {};
-  const currentMatchTime = timer; // capture timer value
+  const currentMatchTime = timer; 
 
   if (winner === "No One") {
     // --- Tie case ---
@@ -410,6 +410,9 @@ window.addEventListener('keyup', (event) => {
 
 // game over interface logic
 function showGameOver(winnerName) {
+  if (matchSaved) return;   // ✅ make extra sure
+  matchSaved = true;
+  
   const screen = document.getElementById('gameOverScreen')
   const winnerText = document.getElementById('winnerText')
 
