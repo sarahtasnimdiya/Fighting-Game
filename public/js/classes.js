@@ -169,9 +169,10 @@ class Fighter extends Sprite {
   switchSprite(sprite) {
     if (this.image === this.sprites.death.image) {
       if (this.framesCurrent === this.sprites.death.framesMax - 1)
+        
+        this.dead = true
         window.gameSounds.done.currentTime = 0;
         window.gameSounds.done.play();
-        this.dead = true
       return
     }
 
