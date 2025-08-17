@@ -363,7 +363,7 @@ window.addEventListener('keyup', (event) => {
   matchSaved = true;
 
   let match = {};
-  const currentMatchTime = timer; 
+  const currentMatchTime = timer; // capture timer value
 
   if (winner === "No One") {
     // --- Tie case ---
