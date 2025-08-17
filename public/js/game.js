@@ -9,6 +9,7 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 const gravity = 0.7
 let gameOver = false;
 let matchSaved = false;
+let removedHidden = false;
 
 // generate sessionId once per browser session
 let sessionId = sessionStorage.getItem("sessionId");
@@ -94,6 +95,7 @@ const player = new Fighter({
     height: 50
   }
 })
+
 
 const enemy = new Fighter({
   position: {
@@ -308,9 +310,13 @@ window.addEventListener('keydown', (event) => {
         player.lastKey = 'a'
         break
       case 'w':
+        window.gameSounds.jump.currentTime = 0;
+        window.gameSounds.jump.play();
         player.velocity.y = -20
         break
       case ' ':
+        window.gameSounds.attack.currentTime = 0;
+        window.gameSounds.attack.play();
         player.attack()
         break
     }
@@ -327,9 +333,13 @@ window.addEventListener('keydown', (event) => {
         enemy.lastKey = 'ArrowLeft'
         break
       case 'ArrowUp':
+        window.gameSounds.jump.currentTime = 0;
+        window.gameSounds.jump.play();
         enemy.velocity.y = -20
         break
       case 'ArrowDown':
+        window.gameSounds.attack.currentTime = 0;
+        window.gameSounds.attack.play();
         enemy.attack()
         break
     }
@@ -417,13 +427,29 @@ function showGameOver(winnerName) {
   const screen = document.getElementById('gameOverScreen')
   const winnerText = document.getElementById('winnerText')
 
+
+
     if (winnerName === 'No One') {
+    // Tie case
+      window.gameSounds.tie.currentTime = 0;
+      window.gameSounds.tie.play();
       winnerText.innerHTML = '<span class="tie">Tie!!</span>'
     } else {
+      // Check winner
+      if (winnerName === (localStorage.getItem('player1Name') || 'Player 1')) {
+        window.gameSounds.win1.currentTime = 0;
+        window.gameSounds.win1.play();
+      } else if (winnerName === (localStorage.getItem('player2Name') || 'Player 2')) {
+        window.gameSounds.win2.currentTime = 0;
+        window.gameSounds.win2.play();
+      }
+
       winnerText.innerHTML = `<span class="winner-name">${winnerName}</span> Wins!`
     }
 
   screen.classList.remove('hidden')
+  removedHidden = true;
+  
 
   const name1 = localStorage.getItem('player1Name') || 'Player 1'
   const name2 = localStorage.getItem('player2Name') || 'Player 2'
@@ -436,14 +462,26 @@ function showGameOver(winnerName) {
   }, 100)
 }
 
+
 function restartGame() {
+  if (removedHidden){window.gameSounds.button.currentTime = 0;
+  window.gameSounds.button.play();}
   window.location.reload()
 }
 
 function goToMenu() {
+  if (removedHidden){window.gameSounds.button.currentTime = 0;
+  window.gameSounds.button.play();}
   window.location.href = '../index.html'
 }
 
 function viewLeaderboard() {
+  if (removedHidden){window.gameSounds.button.currentTime = 0;
+  window.gameSounds.button.play();}
   window.location.href = '../leaderboard.html'
+}
+
+function buttonHover() {
+    if (removedHidden){window.gameSounds.hover.currentTime = 0;
+    window.gameSounds.hover.play();}
 }

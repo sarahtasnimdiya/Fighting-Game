@@ -147,11 +147,18 @@ class Fighter extends Sprite {
   }
 
   attack() {
+    //add sound effect
+    window.gameSounds.attack.currentTime = 0;
+    window.gameSounds.attack.play();
+
     this.switchSprite('attack1')
     this.isAttacking = true
   }
 
   takeHit() {
+    //add sound effect
+    window.gameSounds.hit.currentTime = 0;
+    window.gameSounds.hit.play();
     this.health -= 20
 
     if (this.health <= 0) {
@@ -162,6 +169,8 @@ class Fighter extends Sprite {
   switchSprite(sprite) {
     if (this.image === this.sprites.death.image) {
       if (this.framesCurrent === this.sprites.death.framesMax - 1)
+        window.gameSounds.done.currentTime = 0;
+        window.gameSounds.done.play();
         this.dead = true
       return
     }

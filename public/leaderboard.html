@@ -96,6 +96,7 @@
 </head>
 <body>
   <script type="module" src="./js/firebase.js"></script>
+  <script type="module" src="./js/sound.js"></script>
 
   <h1>LEADERBOARD</h1>
 
@@ -110,9 +111,28 @@
     <tbody id="leaderboardBody"></tbody>
   </table>
 
-  <button class="back-button" onclick="goBack()">⬅ BACK TO MENU</button>
+  <button class="back-button" onmouseover="buttonHover()" onclick="goBack()">⬅ BACK TO MENU</button>
+
+
 
   <script>
+      // Unlock sounds on first user interaction
+  function unlockAudio() {
+    for (const key in window.gameSounds) {
+      window.gameSounds[key].play().then(() => {
+        window.gameSounds[key].pause();
+        window.gameSounds[key].currentTime = 0;
+      }).catch(() => {
+        // ignore errors during unlock
+      });
+    }
+    document.removeEventListener("click", unlockAudio);
+    document.removeEventListener("keydown", unlockAudio);
+  }
+
+  document.addEventListener("click", unlockAudio);
+  document.addEventListener("keydown", unlockAudio);
+    
     // ✅ Use the same sessionId logic as in game.js
     let sessionId = sessionStorage.getItem("sessionId");
     if (!sessionId) {
@@ -164,7 +184,14 @@
     }
 
     function goBack() {
+      window.gameSounds.button.currentTime = 0;
+      window.gameSounds.button.play();
       window.location.href = 'index.html';
+    }
+
+    function buttonHover() {
+      window.gameSounds.hover.currentTime = 0;
+      window.gameSounds.hover.play();
     }
 
     loadLeaderboard();

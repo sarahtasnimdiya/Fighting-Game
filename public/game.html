@@ -337,9 +337,9 @@
           <h1 id="winnerText">Player Wins!</h1>
           <div class="spacer"></div>
           <div class="game-over-buttons">
-             <button onclick="restartGame()">Play Again</button>
-             <button onclick="goToMenu()">Main Menu</button>
-             <button onclick="viewLeaderboard()">View Leaderboard</button>
+             <button onmouseover="buttonHover()" onclick="restartGame()">Play Again</button>
+             <button onmouseover="buttonHover()" onclick="goToMenu()">Main Menu</button>
+             <button onmouseover="buttonHover()" onclick="viewLeaderboard()">View Leaderboard</button>
            </div>
           </div>
         </div>
@@ -357,6 +357,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
+    <script type="module" src="./js/sound.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/classes.js"></script>
     <script src="js/game.js"></script>
@@ -369,33 +370,91 @@
       './img/kenji/Idle.png'
     ];
 
+      // 🎵 Sounds to preload
+      const soundsToLoad = {
+        button: './sound/button.mp3',
+        hover: './sound/hover-button.mp3',
+        attack: './sound/sword.mp3',
+        hit: './sound/sword-slash.mp3',
+        jump: './sound/jumping.mp3',
+        done: './sound/fall.mp3',
+        win1: './sound/win1.mp3',
+        win2: './sound/win2.mp3',
+        tie: './sound/tie.mp3'
+      };
+
+    // Store preloaded sounds globally
+   window.gameSounds = {};
+
+
+      // Ensure they don’t autoplay accidentally
+    for (const key in window.gameSounds) {
+      window.gameSounds[key].preload = "auto";
+    }
+
+    const totalAssets = imagesToLoad.length + Object.keys(soundsToLoad).length;
     let loadedCount = 0;
 
     function updateLoadingBar() {
-      const percent = Math.floor((loadedCount / imagesToLoad.length) * 100);
+      const percent = Math.floor((loadedCount / totalAssets) * 100);
       document.getElementById('loadingBar').style.width = percent + '%';
     }
 
-    imagesToLoad.forEach(src => {
-      const img = new Image();
-      img.src = src;
-      img.onload = () => {
-        loadedCount++;
-        updateLoadingBar();
-        if (loadedCount === imagesToLoad.length) {
+    // ✅ Preload images
+  imagesToLoad.forEach(src => {
+    const img = new Image();
+    img.src = src;
+    img.onload = () => {
+      loadedCount++;
+      updateLoadingBar();
+      checkAllLoaded();
+    };
+  });
+
+  // ✅ Preload sounds
+  Object.entries(soundsToLoad).forEach(([key, src]) => {
+    const audio = new Audio();
+    audio.src = src;
+    audio.preload = "auto";
+    audio.oncanplaythrough = () => {
+      loadedCount++;
+      updateLoadingBar();
+      checkAllLoaded();
+    };
+    window.gameSounds[key] = audio;
+  });
+
+  function checkAllLoaded() {
+    if (loadedCount === totalAssets) {
+      setTimeout(() => {
+        const loadingScreen = document.getElementById('loadingScreen');
+        loadingScreen.style.opacity = 0;
+
         setTimeout(() => {
-          const loadingScreen = document.getElementById('loadingScreen');
-          loadingScreen.style.opacity = 0;
+          loadingScreen.style.display = 'none';
+          // ✅ Start the game once loading screen disappears
+          startGame();
+        }, 800);
+      }, 500);
+    }
+  }
 
-          setTimeout(() => {
-            loadingScreen.style.display = 'none';
-            // ✅ Start the game once loading screen disappears
-            startGame();
-          }, 800);
-        }, 500);
-      }
-      };
-    });
-    </script>
+  // Unlock sounds on first user interaction
+  function unlockAudio() {
+    for (const key in window.gameSounds) {
+      window.gameSounds[key].play().then(() => {
+        window.gameSounds[key].pause();
+        window.gameSounds[key].currentTime = 0;
+      }).catch(() => {
+        // ignore errors during unlock
+      });
+    }
+    document.removeEventListener("click", unlockAudio);
+    document.removeEventListener("keydown", unlockAudio);
+  }
 
-    </body>
+  document.addEventListener("click", unlockAudio);
+  document.addEventListener("keydown", unlockAudio);
+</script>
+</body>
+</html>

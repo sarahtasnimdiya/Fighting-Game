@@ -79,11 +79,28 @@
 
   <h3>ENTER PLAYER NAMES!!</h3>
 
-  <input type="text" id="player1Name" placeholder="PLAYER 1" />
-  <input type="text" id="player2Name" placeholder="PLAYER 2" />
-  <button onclick="startGame()">▶ START MATCH</button>
+  <input type="text" onmouseover="buttonHover()" id="player1Name" placeholder="PLAYER 1" />
+  <input type="text" onmouseover="buttonHover()" id="player2Name" placeholder="PLAYER 2" />
+  <button onclick="startGame()" onmouseover="buttonHover()">▶ START MATCH</button>
 
+  <script type="module" src="./js/sound.js"></script>
   <script>
+      // Unlock sounds on first user interaction
+  function unlockAudio() {
+    for (const key in window.gameSounds) {
+      window.gameSounds[key].play().then(() => {
+        window.gameSounds[key].pause();
+        window.gameSounds[key].currentTime = 0;
+      }).catch(() => {
+        // ignore errors during unlock
+      });
+    }
+    document.removeEventListener("click", unlockAudio);
+    document.removeEventListener("keydown", unlockAudio);
+  }
+
+  document.addEventListener("click", unlockAudio);
+  document.addEventListener("keydown", unlockAudio);
     function startGame() {
       const player1 = document.getElementById('player1Name').value.trim();
       const player2 = document.getElementById('player2Name').value.trim();
@@ -91,8 +108,18 @@
       localStorage.setItem('player1Name', player1 || 'Player 1');
       localStorage.setItem('player2Name', player2 || 'Player 2');
 
+      // Play sound effect
+      window.gameSounds.button.currentTime = 0;
+      window.gameSounds.button.play();
       window.location.href = 'game.html';
     }
+
+    // Hover sound effect
+    function buttonHover() {
+      window.gameSounds.hover.currentTime = 0;
+      window.gameSounds.hover.play();
+    }
+
   </script>
 </body>
 </html>
