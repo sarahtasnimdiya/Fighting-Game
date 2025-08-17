@@ -363,6 +363,7 @@ window.addEventListener('keyup', (event) => {
   matchSaved = true;
 
   let match = {};
+  const currentMatchTime = timer; 
 
   if (winner === "No One") {
     // --- Tie case ---
@@ -371,7 +372,8 @@ window.addEventListener('keyup', (event) => {
       player2,
       winner: "Tie",
       loser: "Tie",
-      sessionId
+      sessionId,
+      matchTime: currentMatchTime,
     };
   } else {
     // --- Normal case ---
@@ -381,7 +383,8 @@ window.addEventListener('keyup', (event) => {
       player2,
       winner,
       loser,
-      sessionId, // ✅ include sessionId
+      sessionId,
+      matchTime: currentMatchTime,
     };
   }
 
