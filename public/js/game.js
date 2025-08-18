@@ -337,8 +337,8 @@ window.addEventListener('keydown', (event) => {
         enemy.lastKey = 'ArrowLeft'
         break
       case 'ArrowUp':
-        if (player.position.y + player.height >= canvas.height - 96) { 
-          // Only jump if player is on the ground
+        if (enemy.position.y + enemy.height >= canvas.height - 96) { 
+          // Only jump if enemy is on the ground
           window.gameSounds.jump.currentTime = 0;
           window.gameSounds.jump.play();
           enemy.velocity.y = -20;
