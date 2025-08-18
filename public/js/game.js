@@ -8,6 +8,7 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 
 const gravity = 0.7
 let gameOver = false;
+let shownGameOver = false;
 let matchSaved = false;
 let removedHidden = false;
 
@@ -310,9 +311,12 @@ window.addEventListener('keydown', (event) => {
         player.lastKey = 'a'
         break
       case 'w':
-        window.gameSounds.jump.currentTime = 0;
-        window.gameSounds.jump.play();
-        player.velocity.y = -20
+        if (player.position.y + player.height >= canvas.height - 96) { 
+          // Only jump if player is on the ground
+          window.gameSounds.jump.currentTime = 0;
+          window.gameSounds.jump.play();
+          player.velocity.y = -20;
+        }
         break
       case ' ':
         window.gameSounds.attack.currentTime = 0;
@@ -333,9 +337,12 @@ window.addEventListener('keydown', (event) => {
         enemy.lastKey = 'ArrowLeft'
         break
       case 'ArrowUp':
-        window.gameSounds.jump.currentTime = 0;
-        window.gameSounds.jump.play();
-        enemy.velocity.y = -20
+        if (player.position.y + player.height >= canvas.height - 96) { 
+          // Only jump if player is on the ground
+          window.gameSounds.jump.currentTime = 0;
+          window.gameSounds.jump.play();
+          enemy.velocity.y = -20;
+        }
         break
       case 'ArrowDown':
         window.gameSounds.attack.currentTime = 0;
@@ -429,30 +436,34 @@ function showGameOver(winnerName) {
 
 
 
-    if (winnerName === 'No One') {
-    // Tie case
-      window.gameSounds.tie.currentTime = 0;
-      window.gameSounds.tie.play();
-      winnerText.innerHTML = '<span class="tie">Tie!!</span>'
-    } else {
+    if (winnerName != 'No One') {
       // Check winner
-      if (winnerName === (localStorage.getItem('player1Name') || 'Player 1')) {
+      if (winnerName === (localStorage.getItem('player1Name'))) {
         window.gameSounds.win1.currentTime = 0;
         window.gameSounds.win1.play();
-      } else if (winnerName === (localStorage.getItem('player2Name') || 'Player 2')) {
+      } else if (winnerName === (localStorage.getItem('player2Name'))) {
         window.gameSounds.win2.currentTime = 0;
         window.gameSounds.win2.play();
       }
 
       winnerText.innerHTML = `<span class="winner-name">${winnerName}</span> Wins!`
+      shownGameOver = true;
+
+    } else {
+      if(!shownGameOver){
+      // Tie case
+      window.gameSounds.tie.currentTime = 0;
+      window.gameSounds.tie.play();
+      winnerText.innerHTML = '<span class="tie">Tie!!</span>'
+      }
     }
 
   screen.classList.remove('hidden')
   removedHidden = true;
   
 
-  const name1 = localStorage.getItem('player1Name') || 'Player 1'
-  const name2 = localStorage.getItem('player2Name') || 'Player 2'
+  const name1 = localStorage.getItem('player1Name') 
+  const name2 = localStorage.getItem('player2Name') 
 
   // Save to leaderboard
   saveToLeaderboard(name1, name2, winnerName)

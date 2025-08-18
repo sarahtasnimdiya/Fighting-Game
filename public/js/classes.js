@@ -83,6 +83,7 @@ class Fighter extends Sprite {
       offset
     })
 
+    this.done = false;
     this.velocity = velocity
     this.width = 50
     this.height = 150
@@ -171,8 +172,10 @@ class Fighter extends Sprite {
       if (this.framesCurrent === this.sprites.death.framesMax - 1)
         
         this.dead = true
-        window.gameSounds.done.currentTime = 0;
-        window.gameSounds.done.play();
+        if (this.done) {
+          window.gameSounds.done.currentTime = 0;
+          window.gameSounds.done.play();
+        }
       return
     }
 
