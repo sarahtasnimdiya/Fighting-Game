@@ -1,0 +1,12 @@
+{
+  "name": "fighting-game",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+  "build": "echo Build step not required"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
