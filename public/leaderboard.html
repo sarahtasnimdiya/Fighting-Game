@@ -92,11 +92,145 @@
       background-color: #555;
       transform: scale(1.05);
     }
+
+    #settingsControl {
+  position: absolute;
+  top: 7.5%;   /* adjust until it sits nicely */
+  right: 12%; /* adjust for exact placement */
+}
+
+#settingsControl button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+#settingsControl img {
+  width: clamp(24px, 4vw, 36px);  /* min 24px, max 36px, responsive */
+  height: 36px;                  /* keep proportions */
+  transition: transform 0.2s;
+  
+}
+
+
+#settingsControl img:hover {
+  transform: scale(1.1);
+}
+
+
+#settingsModal {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: 'Press Start 2P', cursive;
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+#settingsModal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.settings-content {
+  background: #0f001cd6;
+  width: 100%;
+  height: 100%;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 25px #222, 0 0 50px #000 inset;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  min-width: 300px;
+}
+
+#settingsModal h2 {
+      font-size: 28px;
+  color: #ffcc00;
+  text-shadow: 0 0 15px #ff6600, 0 0 30px #ffcc00;
+  animation: pauseGlow 2s infinite alternate;
+  margin-bottom: 20px;
+    }
+
+@keyframes pauseGlow {
+  from { text-shadow: 0 0 10px #ff6600; }
+  to { text-shadow: 0 0 30px #ffff99; }
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #fff;
+}
+
+.setting-item input {
+  transform: scale(1.3);
+  box-shadow: none;
+  margin-right: 5px;
+  cursor: pointer;
+  width: 10px;
+}
+
+.setting-item label {
+  cursor: pointer;
+}
+
+
+
+.setting-item .icon {
+  width: 28px;
+  height: 28px;
+}
+
+.settings-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.settings-buttons button.icon-only {
+  background: #444;
+  border: 2px solid #666;
+  padding: 10px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: auto;
+}
+
+.settings-buttons button.icon-only:hover {
+  background: #666;
+  transform: scale(1.1);
+}
+
+.settings-buttons button.icon-only img {
+  width: 28px;
+  height: 28px;
+}
+
   </style>
 </head>
 <body>
   <script type="module" src="./js/firebase.js"></script>
   <script type="module" src="./js/sound.js"></script>
+  <script  src="./js/index.js"></script>
 
   <h1>LEADERBOARD</h1>
 
@@ -112,6 +246,38 @@
   </table>
 
   <button class="back-button" onmouseover="buttonHover()" onclick="goBack()">⬅ BACK TO MENU</button>
+
+<!-- Settings Button -->
+<div id="settingsControl">
+  <button onclick="openSettings()">
+    <img src="./img/icons/Gear.png" alt="Settings" />
+  </button>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModal">
+  <div class="settings-content">
+    <h2>SETTINGS</h2>
+
+    <div class="setting-item">
+      <input type="checkbox" id="soundToggle" checked>
+      <img src="./img/icons/Speaker-0.png" alt="Sound" class="icon" />
+      <label for="soundToggle">Sound Effects</label>
+    </div>
+
+    <div class="setting-item">
+      <input type="checkbox" id="musicToggle" unchecked>
+      <img src="./img/icons/Music-0.png" alt="Music" class="icon" />
+      <label for="musicToggle">Music</label>
+    </div>
+
+    <div class="settings-buttons">
+      <button class="icon-only" onclick="closeSettings()">
+        <img src="./img/icons/Exit.png" alt="Close" />
+      </button>
+    </div>
+  </div>
+</div>
 
 
 

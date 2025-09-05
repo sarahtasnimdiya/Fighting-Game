@@ -1,3 +1,4 @@
+
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
@@ -11,6 +12,54 @@ let gameOver = false;
 let shownGameOver = false;
 let matchSaved = false;
 let removedHidden = false;
+let paused = false; 
+let isRunSoundPlaying = false;
+
+
+let timer = 60;
+let timerId;
+
+function decreaseTimer() {
+  if (paused) {
+    // retry check after 1s while paused
+    timerId = setTimeout(decreaseTimer, 1000);
+    return;
+  }
+
+  if (timer > 0) {
+    timerId = setTimeout(decreaseTimer, 1000);
+    timer--;
+    document.querySelector('#timer').innerHTML = timer;
+  } else {
+    // Time ran out
+    const name1 = localStorage.getItem('player1Name') || 'Player 1';
+    const name2 = localStorage.getItem('player2Name') || 'Player 2';
+
+    if (player.health === enemy.health) {
+      showGameOver('No One'); 
+    } else if (player.health > enemy.health) {
+      showGameOver(name1);
+    } else {
+      showGameOver(name2);
+    }
+  }
+}
+
+
+function rectangularCollision({ rectangle1, rectangle2 }) {
+  return (
+    rectangle1.attackBox.position.x + rectangle1.attackBox.width >=
+      rectangle2.position.x &&
+    rectangle1.attackBox.position.x <=
+      rectangle2.position.x + rectangle2.width &&
+    rectangle1.attackBox.position.y + rectangle1.attackBox.height >=
+      rectangle2.position.y &&
+    rectangle1.attackBox.position.y <= rectangle2.position.y + rectangle2.height
+  )
+}
+
+
+
 
 // generate sessionId once per browser session
 let sessionId = sessionStorage.getItem("sessionId");
@@ -186,6 +235,12 @@ function animate() {
   player.update()
   enemy.update()
 
+   if (paused) {
+    player.switchSprite('idle');
+    enemy.switchSprite('idle');
+    return; // stop gameplay updates
+  }
+
   player.velocity.x = 0
   enemy.velocity.x = 0
 
@@ -236,6 +291,19 @@ function animate() {
   } else if (enemy.velocity.y > 0) {
     enemy.switchSprite('fall')
   }
+
+  // --- Running sound ---
+if (
+  (keys.a.pressed && player.lastKey === 'a') || 
+  (keys.d.pressed && player.lastKey === 'd') ||
+  (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft') || 
+  (keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight')
+) {
+  playRunSound();
+} else {
+  stopRunSound();
+}
+
 
   // player attack hits enemy
   if (
@@ -291,15 +359,111 @@ function animate() {
   
 }
 
+
+
+
+
+function openSettings() {
+
+  if (window.gameSounds && window.gameSounds.button) {
+    window.gameSounds.button.currentTime = 0;
+    window.gameSounds.button.play();
+  }
+
+
+  const modal = document.getElementById('settingsModal');
+  modal.classList.remove('hidden');
+  setTimeout(() => modal.classList.add('show'), 50);
+  paused = true;
+}
+
+function closeSettings() {
+
+  if (window.gameSounds.button) {
+    window.gameSounds.button.currentTime = 0;
+    window.gameSounds.button.play();
+  }
+
+  const modal = document.getElementById('settingsModal');
+  modal.classList.remove('show');
+  setTimeout(() => modal.classList.add('hidden'), 400);
+  paused = false; 
+}
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const soundToggle = document.getElementById("soundToggle");
+  const musicToggle = document.getElementById("musicToggle");
+
+  // --- Load persisted values ---
+  const soundEnabled = localStorage.getItem("soundEnabled") !== "false"; // default true
+  const musicEnabled = localStorage.getItem("musicEnabled") === "true";  // default false
+
+  if (soundToggle) soundToggle.checked = soundEnabled;
+  if (musicToggle) musicToggle.checked = musicEnabled;
+
+  // Apply immediately
+  for (const key in window.gameSounds) {
+    if (key !== "backgroundMusic") {
+      window.gameSounds[key].muted = !soundEnabled;
+    }
+  }
+  if (window.gameSounds.backgroundMusic) {
+    if (musicEnabled) {
+      window.gameSounds.backgroundMusic.play().catch(() => {});
+    } else {
+      window.gameSounds.backgroundMusic.pause();
+    }
+  }
+
+  // --- Save on toggle ---
+  soundToggle.addEventListener("change", () => {
+    const enabled = soundToggle.checked;
+    localStorage.setItem("soundEnabled", enabled);
+    for (const key in window.gameSounds) {
+      if (key !== "backgroundMusic") {
+        window.gameSounds[key].muted = !enabled;
+      }
+    }
+    if (enabled && window.gameSounds.button) {
+      window.gameSounds.button.currentTime = 0;
+      window.gameSounds.button.play();
+    }
+  });
+
+  musicToggle.addEventListener("change", () => {
+    const enabled = musicToggle.checked;
+    localStorage.setItem("musicEnabled", enabled);
+
+    if (window.gameSounds.button && soundToggle.checked) {
+    window.gameSounds.button.currentTime = 0;
+    window.gameSounds.button.play();
+  }
+  
+    if (!window.gameSounds.backgroundMusic) return;
+    if (enabled) {
+      window.gameSounds.backgroundMusic.play().catch(() => {});
+    } else {
+      window.gameSounds.backgroundMusic.pause();
+    }
+  });
+});
+
+
+
 function startGame() {
+  timer = 60; // reset
   decreaseTimer();
   document.getElementById("gameContainer").style.display = "inline-block";
 }
+
 
 animate();
 
 // input events
 window.addEventListener('keydown', (event) => {
+  if (paused) return;
   if (!player.dead) {
     switch (event.key) {
       case 'd':
@@ -318,7 +482,7 @@ window.addEventListener('keydown', (event) => {
           player.velocity.y = -20;
         }
         break
-      case ' ':
+      case 's':
         window.gameSounds.attack.currentTime = 0;
         window.gameSounds.attack.play();
         player.attack()
@@ -354,6 +518,7 @@ window.addEventListener('keydown', (event) => {
 })
 
 window.addEventListener('keyup', (event) => {
+  if (paused) return;
   switch (event.key) {
     case 'd':
       keys.d.pressed = false
@@ -434,6 +599,10 @@ function showGameOver(winnerName) {
   const screen = document.getElementById('gameOverScreen')
   const winnerText = document.getElementById('winnerText')
 
+  // Hide pause/settings when game over
+  document.getElementById("pauseControl").style.display = "none";
+  document.getElementById("settingsControl").style.display = "none";
+
 
 
     if (winnerName != 'No One') {
@@ -473,6 +642,29 @@ function showGameOver(winnerName) {
   }, 100)
 }
 
+function togglePause() {
+
+  if (window.gameSounds && window.gameSounds.button) {
+    window.gameSounds.button.currentTime = 0;
+    window.gameSounds.button.play();
+  }
+
+
+  paused = !paused;
+  const pauseBtn = document.getElementById("pauseBtn").querySelector("img");
+  const pauseScreen = document.getElementById("pauseScreen");
+  pauseScreen.classList.remove("hidden");
+
+  if (paused) {
+    pauseBtn.src = "./img/icons/Play.png";
+    pauseScreen.classList.remove("hidden");
+    pauseScreen.classList.add("show");
+  } else {
+    pauseBtn.src = "./img/icons/Pause.png";
+    pauseScreen.classList.remove("show");
+    pauseScreen.classList.add("hidden");
+  }
+}
 
 function restartGame() {
   if (removedHidden){window.gameSounds.button.currentTime = 0;
@@ -481,7 +673,8 @@ function restartGame() {
 }
 
 function goToMenu() {
-  if (removedHidden){window.gameSounds.button.currentTime = 0;
+  if (window.gameSounds && window.gameSounds.button){
+  window.gameSounds.button.currentTime = 0;
   window.gameSounds.button.play();}
   window.location.href = '../index.html'
 }
@@ -492,7 +685,69 @@ function viewLeaderboard() {
   window.location.href = '../leaderboard.html'
 }
 
+function resumeGame() {
+  if (window.gameSounds && window.gameSounds.button) {
+    window.gameSounds.button.currentTime = 0;
+    window.gameSounds.button.play();
+  }
+  togglePause();
+}
+
 function buttonHover() {
-    if (removedHidden){window.gameSounds.hover.currentTime = 0;
+    if (window.gameSounds && window.gameSounds.hover){
+    window.gameSounds.hover.currentTime = 0;
     window.gameSounds.hover.play();}
 }
+
+function playRunSound() {
+  if (!window.gameSounds || !window.gameSounds.run) return;
+
+  if (!isRunSoundPlaying) {
+    window.gameSounds.run.loop = true;   // footsteps should loop
+    window.gameSounds.run.playbackRate = 5.0;  // ✅ 5x speed
+    window.gameSounds.run.currentTime = 0;
+    window.gameSounds.run.play().catch(() => {}); // ignore autoplay errors
+    isRunSoundPlaying = true;
+  }
+}
+
+
+function stopRunSound() {
+  if (!window.gameSounds || !window.gameSounds.run) return;
+
+  if (isRunSoundPlaying) {
+    window.gameSounds.run.pause();
+    window.gameSounds.run.currentTime = 0;
+    isRunSoundPlaying = false;
+  }
+}
+
+// Make every button play hover sound once per entry
+document.querySelectorAll("button").forEach(btn => {
+  btn.addEventListener("mouseenter", () => {
+    if (window.gameSounds.hover) {
+      window.gameSounds.hover.currentTime = 0;
+      window.gameSounds.hover.play();
+    }
+  });
+
+  btn.addEventListener("click", () => {
+    if (window.gameSounds.button) {
+      window.gameSounds.button.currentTime = 0;
+      window.gameSounds.button.play();
+    }
+  });
+});
+
+
+function playButtonSound() {
+  if (!paused || removedHidden) {
+    if (window.gameSounds && window.gameSounds.button) {
+      window.gameSounds.button.currentTime = 0;
+      window.gameSounds.button.play();
+    }
+  }
+}
+
+
+
